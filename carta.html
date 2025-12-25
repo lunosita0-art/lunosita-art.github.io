@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lunosita</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #051414;
+            --book-cover: #8a1c1c;
+            --text-gold: #d4af37;
+            --text-dark: #2c3e50;
+            --mi-imagen: url('fondo.png'); 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; 
+            cursor: url('1.png'), auto !important;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-color);
+            background-image: linear-gradient(to bottom, #020b16, #0a2f1c);
+            font-family: 'Playfair Display', serif;
+            overflow: hidden;
+            perspective: 1000px; 
+        }
+
+        #snow-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 100; 
+        }
+
+        .snowflake {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: fall linear forwards;
+        }
+
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: var(--opacity);
+            }
+            100% {
+                transform: translateY(110vh) translateX(var(--end-x)) rotate(var(--rot));
+                opacity: 0;
+            }
+        }
+
+        .book {
+            position: relative;
+            width: 350px;
+            height: 500px;
+            perspective: 1500px;
+            z-index: 10; 
+            transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .book.open-state { transform: translateX(50%); }
+        .book.center-back { transform: translateX(100%); }
+
+        .paper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0; left: 0;
+            perspective: 1500px;
+            transform-origin: left;
+            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+            transform-style: preserve-3d;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .front, .back {
+            position: absolute;
+            width: 100%; height: 100%;
+            top: 0; left: 0;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            overflow: hidden;
+            cursor: pointer;
+            background-color: #fffbf0;
+            background-image: var(--mi-imagen);
+            background-size: cover;
+            background-position: center; 
+        }
+
+        .front { z-index: 2; }
+        .back {
+            transform: rotateY(180deg);
+            z-index: 1;
+            border-left: 3px solid rgba(0,0,0,0.1);
+        }
+
+        .content-overlay {
+            background: rgba(255, 255, 255, 0); 
+            padding: 15px;
+            border-radius: 10px;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+        }
+
+        #p1 .front {
+            background-image: none;
+            background-color: var(--book-cover);
+            border: 2px solid gold;
+            color: white;
+        }
+        
+        .cover-img {
+            width: 150px; height: 150px;
+            object-fit: cover;
+            margin-bottom: 30px;
+            
+        }
+
+        #p3 .back {
+            background-image: none;
+            background-color: var(--book-cover);
+            color: white;
+            border: 2px solid gold;
+        }
+
+        h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color:  #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        p {
+            font-size: 1.6rem;
+            line-height: 1.6;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .cover-text { color: var(--text-gold); font-size: 1.2rem; font-style: italic; font-weight: normal; }
+        
+        .photo-frame {
+            width: 85%; height: 55%;
+            background: #fff;
+            padding: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: rotate(2deg);
+            margin-bottom: 20px;
+        }
+        .photo-frame img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            border: 1px solid #eee;
+        }
+        .caption {
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.8rem;
+            color: #8a1c1c;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 15px;
+            border-radius: 15px;
+        }
+
+        #p1 { z-index: 3; }
+        #p2 { z-index: 2; }
+        #p3 { z-index: 1; }
+
+        .flipped { transform: rotateY(-180deg); }
+        
+        .hint {
+            position: absolute; bottom: 5px;
+            color: gold; font-size: 0.7rem;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        @media (max-width: 600px) {
+            .book { width: 90vw; height: 60vh; }
+            h1 { font-size: 2.5rem; }
+            .book.open-state { transform: translateX(0); }
+            .book.center-back { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="snow-container"></div>
+
+    <div class="book" id="book">
+        <div class="paper" id="p1">
+            <div class="front" id="p1-front">
+                <div class="content-overlay">
+                    <img src="arbol.png" alt="Portada Navidad" class="cover-img">
+                    <h1>Feliz Navidad</h1>
+                    <p class="cover-text">Una historia de momentos especiales...</p>
+                    <p class="hint">(Toca para abrir)</p>
+                </div>
+            </div>
+            <div class="back" id="p1-back">
+                <div class="content-overlay">
+                    <p>En estas fechas tan mágicas, agradezco por tenerte en mi vida.</p>
+                    <p>Me gustan los momentos de risas que tenemos jeje</p>
+                    <div style="color: #8a1c1c; font-size: 30px;">❄️</div>
+                    <p class="hint" style="font-size:0.7rem; color:#888;">(Izquierda para volver)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="paper" id="p2">
+            <div class="front" id="p2-front">
+                <div class="content-overlay">
+                    <div class="photo-frame">
+                        <img src="f4.png" alt="Foto 1">
+                    </div>
+                    <div class="caption">Momentos Mágicos</div>
+                </div>
+            </div>
+            <div class="back" id="p2-back">
+                <div class="content-overlay">
+                    <p>Ni todas las estrellas brillan tanto como tú.</p>
+                    <p>Gracias por iluminar mi vida cada noche, mi Lunosita❤️.</p>
+                    <div style="color: #8a1c1c; font-size: 30px;">⭐</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="paper" id="p3">
+            <div class="front" id="p3-front">
+                <div class="content-overlay">
+                    <div class="photo-frame" style="transform: rotate(-2deg);">
+                        <img src="f2.png" alt="Foto 2">
+                    </div>
+                    <div class="caption">Merry Christmas</div>
+                </div>
+            </div>
+            <div class="back" id="p3-back">
+                <div class="content-overlay">
+                    <h1>¡Te Quiero <br> Espero que te haya justado!</h1>
+                    <p class="cover-text">Esto era lo que estaba haciendo jeje,</p>
+                    <br>
+                    <p class="cover-text" style="font-size: 1.5rem; color: gold;">Bicho</p>
+                    <p class="hint" style="margin-top:20px;">(Toca para cerrar el libro)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const book = document.getElementById('book');
+        const p1 = document.getElementById('p1');
+        const p2 = document.getElementById('p2');
+        const p3 = document.getElementById('p3');
+
+        const p1Front = document.getElementById('p1-front');
+        const p1Back = document.getElementById('p1-back');
+        const p2Front = document.getElementById('p2-front');
+        const p2Back = document.getElementById('p2-back');
+        const p3Front = document.getElementById('p3-front');
+        const p3Back = document.getElementById('p3-back');
+
+        const animationDelay = 600;
+
+        function goNext(pageElement, nextZ) {
+            pageElement.classList.add('flipped');
+            if(pageElement.id === 'p1') {
+                book.classList.add('open-state');
+            } else if (pageElement.id === 'p3') {
+                book.classList.remove('open-state');
+                book.classList.add('center-back');
+            }
+            setTimeout(() => { pageElement.style.zIndex = nextZ; }, animationDelay);
+        }
+
+        function goPrev(pageElement, originalZ) {
+            pageElement.classList.remove('flipped');
+            if(pageElement.id === 'p1') {
+                book.classList.remove('open-state');
+            }
+            setTimeout(() => { pageElement.style.zIndex = originalZ; }, animationDelay);
+        }
+
+        function closeBook() {
+            p3.classList.remove('flipped');
+            p2.classList.remove('flipped');
+            p1.classList.remove('flipped');
+            book.classList.remove('center-back');
+            book.classList.remove('open-state');
+            setTimeout(() => {
+                p3.style.zIndex = 1; p2.style.zIndex = 2; p1.style.zIndex = 3;
+            }, animationDelay);
+        }
+
+        p1Front.addEventListener('click', () => { goNext(p1, 1); });
+        p1Back.addEventListener('click', () => { goPrev(p1, 3); });
+        p2Front.addEventListener('click', () => { goNext(p2, 2); });
+        p2Back.addEventListener('click', () => { goPrev(p2, 2); });
+        p3Front.addEventListener('click', () => { goNext(p3, 3); });
+        p3Back.addEventListener('click', closeBook);
+
+
+        const snowContainer = document.getElementById('snow-container');
+
+        function createSnowflake() {
+            const flake = document.createElement('div');
+            flake.classList.add('snowflake');
+            const size = Math.random() * 4 + 2; 
+            flake.style.width = `${size}px`;
+            flake.style.height = `${size}px`;
+
+            const startLeft = Math.random() * 100;
+            flake.style.left = `${startLeft}vw`;
+
+            const duration = Math.random() * 5 + 5; 
+            flake.style.animationDuration = `${duration}s`;
+
+            const endX = (Math.random() - 0.5) * 200; 
+            flake.style.setProperty('--end-x', `${endX}px`);
+
+            const rot = (Math.random() - 0.5) * 720; 
+            flake.style.setProperty('--rot', `${rot}deg`);
+
+            flake.style.setProperty('--opacity', Math.random() * 0.5 + 0.3);
+
+           
+            if(size < 3) {
+                flake.style.filter = `blur(1px)`;
+                flake.style.zIndex = 0; 
+            } else {
+                 flake.style.zIndex = 20;
+            }
+
+            snowContainer.appendChild(flake);
+
+            setTimeout(() => { flake.remove(); }, duration * 1000);
+        }
+
+        setInterval(createSnowflake, 1); 
+
+    </script>
+</body>
+
+ <!-- 
+
+Contáctame:
+
+    * Invitame un café
+ https://buymeacoffee.com/alexx.dev
+
+    * Portafolio Web
+ https://alexxdev.vercel.app
+
+    * Sigueme en tiktok
+ https://www.tiktok.com/@alexx.dev?is_from_webapp=1&sender_device=pc 
+ 
+    *Canal de WhatsApp
+ https://whatsapp.com/channel/0029VazQEXq90x2vIdNkrH1p
+
+ 
+ WhatsApp: +52 1 55 6628 1018
+
+-->
+ 
+</html>
